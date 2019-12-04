@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <script src="vector3.js" charset="utf-8"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="./p5/p5.min.js"></script>
+        <script src="./p5/p5.dom.min.js"></script>
+        <script src="./p5/p5.sound.min.js"></script>
+        <script src="./Tone.js"></script>
+        <script language="javascript" type="text/javascript" src="./aframe/aframe.min.js"></script>
+        <script language="javascript" type="text/javascript" src="./aframe/aframep5.js"></script>
+    </head>
+    <body>
+        <a-scene id = "VRScene">
+            <a-assets id = "VRAssets">
+                <img id = "sky" src="assets/sky.jpg">
+                <a-asset id="sunflowerObj" src="/assets/sunflower/sunflower.obj"></a-asset>
+                <a-asset id="sunflowerMtl" src="/assets/sunflower/sunflower.mtl"></a-asset>
+
+                <a-asset id="shroomObj" src="/assets/shroom/shroom.obj"></a-asset>
+                <a-asset id="shroomMtl" src="/assets/shroom/shroom.mtl"></a-asset>
+
+                <a-asset id="roseObj" src="/assets/rose/rose.obj"></a-asset>
+                <a-asset id="roseMtl" src="/assets/rose/rose.mtl"></a-asset>
+
+                <a-asset id="desertLilyObj" src="/assets/desert_lily/desertLily.obj"></a-asset>
+                <a-asset id="desertLilyMtl" src="/assets/desert_lily/desertLily.mtl"></a-asset>
+
+            </a-assets>
+        </a-scene>
+        <script src="./Flower.js"></script>
+        <script src="client.js" charset="utf-8"></script>
+    </body>
+</html>
