@@ -20,20 +20,20 @@ socket.on('update', function(otherPlayerInfo) {
 
 });
 
-socket.on('newPlayer', function(newPlayerId) {
-    // a new player needs to be added
-    if (newPlayerId == myId) {
-        for (var playerId in serverData) {
-            if (playerId === myId) //don't add yourself!
-                continue;
-            otherPlayers[playerId] = new OtherPlayer(playerId);
-        }
-    }
-    else {
-            console.log("gained a new player, ", newPlayerId);
-        otherPlayers[newPlayerId] = new OtherPlayer(newPlayerId);
-    }
-});
+// socket.on('newPlayer', function(newPlayerId) {
+//     // a new player needs to be added
+//     if (newPlayerId == myId) {
+//         for (var playerId in serverData) {
+//             if (playerId === myId) //don't add yourself!
+//                 continue;
+//             otherPlayers[playerId] = new OtherPlayer(playerId);
+//         }
+//     }
+//     else {
+//             console.log("gained a new player, ", newPlayerId);
+//         otherPlayers[newPlayerId] = new OtherPlayer(newPlayerId);
+//     }
+// });
 
 socket.on('playerLost', function(lostPlayerId) {
     delete(otherPlayers[lostPlayerId]);
@@ -64,17 +64,31 @@ function setup() {
 }
 
 function draw() {
+    processServerData();
     player.move();
-    //go through list of all players and update position & rotation
-    // for (i in serverData) {
-    //     if (i == myId)
-    //         continue;
-    //     otherPlayers[i].setPositionAndRotation(serverData[i].position, serverData[i].rotation);
-    // }
-
 }
 
 function mousePressed() {
+}
+
+function processServerData()
+{
+    // console.log("Id exists?", idExists);
+    for (otherPlayerId in serverData)
+    {
+        if (otherPlayerId == myId) continue;
+        var idExists = otherPlayerId in otherPlayers;
+        if (idExists == false)
+        {
+            otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
+            console.log("Found new player...need to add");
+        }
+
+        else
+        {
+            otherPlayers[otherPlayerId].setPositionAndRotation(serverData[otherPlayerId].position, serverData[otherPlayerId].rotation);
+        }
+    }
 }
 
 function keyPressed() {
@@ -82,7 +96,6 @@ function keyPressed() {
         player.onClick();
     player.sendDataToServer();
 }
-
 
 class Player {
     constructor() {
@@ -104,9 +117,7 @@ class Player {
         this.position.set(world.getUserPosition());
         this.rotation.set(world.getUserRotation());
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
-        // this.sendDataToServer();
-        console.log(this.position.get());
-
+        this.sendDataToServer();
     }
 
     onClick() {
@@ -123,7 +134,8 @@ class Player {
 }
 
 class OtherPlayer {
-    constructor() {
+    constructor(id) {
+        this.id = id;
         this.initialized = false;
         // keep track of other players' rotation and position to send to the server
         this.position = new Vector3(0, 1, 0);
@@ -131,7 +143,7 @@ class OtherPlayer {
 
         this.avatar = new Sphere({
             x: this.position.x, y: this.position.y, z: this.position.z,
-            red: 255, green: 0, blue: 0,
+            red: random(255), green: random(255), blue: random(255),
             radius: 0.5
         });
     }
@@ -142,11 +154,11 @@ class OtherPlayer {
             world.add(this.avatar);
             this.initialized = true;
         }
-        this.position.copy(position);
-        this.rotation.copy(rotation);
+        this.position.set(position);
+        this.rotation.set(rotation);
 
-        // this.avatar.setPosition(this.position.x, this.position.y, this.position.z);
-        // this.avatar.setRotation(this.rotation.x, this.rotation.y, this.rotation.z)
+        this.avatar.setPosition(this.position.x, this.position.y, this.position.z);
+        this.avatar.setRotation(this.rotation.x, this.rotation.y, this.rotation.z)
     }
 
 }

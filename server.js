@@ -44,26 +44,16 @@ io.on("connection", (socket) => {
     io.sockets.emit("newPlayer", socket.id);
     io.sockets.emit("update", users);
 
-    // callback methods
-    // grabs the current position and rotation info from each Player
-    // socket.on('newPosition', (userInfo) => {
-    //     users[socket.id].position.set(userInfo.position);
-    //     users[socket.id].rotation.set(userInfo.rotation);
-    //     // console.log(users);
-    //     console.log(socket.id);
-    //
-    //
-    // });
     socket.on('newPosition', (position) =>
     {
-        console.log(socket.id);
-        console.log(position, "\n\n\n");
+        users[socket.id] = position
         // socket.broadcast.emit('newPosition', position)
     })
 
     socket.on("disconnect", () => {
         console.log(`Someone disconnected... ${socket.id}`);
         delete(users[socket.id]);
+        io.sockets.emit("playerLost", socket.id);
     });
 
 })
