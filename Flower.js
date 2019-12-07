@@ -21,13 +21,15 @@ class Flower {
         var oscillatorType = "";
 
         if (type=="rose"){
-            oscillatorType = "sawtooth"
+            oscillatorType = "sine"
         }
 
-        this.oscillator = new Tone.Oscillator(440, oscillatorType).toMaster().start();
+        var freq = MAJOR_FREQUENCIES[Math.floor(random(14))][Math.floor(random(3))];
+        this.oscillator = new Tone.Oscillator(freq, oscillatorType);
         this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
         this.oscillator.connect(this.panner);
-
+        this.oscillator.start();
+        this.panner.toMaster();
 
     }
 

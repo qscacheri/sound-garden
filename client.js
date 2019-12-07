@@ -118,6 +118,8 @@ class Player {
         this.rotation.set(world.getUserRotation());
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
         this.sendDataToServer();
+        Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
+        console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
     onClick() {
