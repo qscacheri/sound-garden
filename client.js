@@ -9,9 +9,11 @@ var processor;
 var world;
 var initialized = false;
 
+
 socket.on('connect', function() {
     myId = socket.id;
-
+    if (typeof(player) != "undefined")
+        player.initialize();
 });
 
 socket.on('update', function(otherPlayerInfo) {
@@ -19,21 +21,6 @@ socket.on('update', function(otherPlayerInfo) {
     serverData = otherPlayerInfo;
 
 });
-
-// socket.on('newPlayer', function(newPlayerId) {
-//     // a new player needs to be added
-//     if (newPlayerId == myId) {
-//         for (var playerId in serverData) {
-//             if (playerId === myId) //don't add yourself!
-//                 continue;
-//             otherPlayers[playerId] = new OtherPlayer(playerId);
-//         }
-//     }
-//     else {
-//             console.log("gained a new player, ", newPlayerId);
-//         otherPlayers[newPlayerId] = new OtherPlayer(newPlayerId);
-//     }
-// });
 
 socket.on('playerLost', function(lostPlayerId) {
     delete(otherPlayers[lostPlayerId]);
@@ -92,8 +79,7 @@ function processServerData()
 }
 
 function keyPressed() {
-    if (keyCode== 32)
-        player.onClick();
+    player.keyPressed(keyCode);
     player.sendDataToServer();
 }
 
@@ -105,7 +91,13 @@ class Player {
 
         this.container = new Container3D({x: 0, y: 1, z: 5});
         world.add(this.container);
-        // this.container.addChild(sunflower);
+
+        this.flowerCollection = new FlowerCollection(myId);
+    }
+
+    initialize()
+    {
+        this.flowerCollection.id = myId
     }
 
     move() {
@@ -119,18 +111,24 @@ class Player {
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
         this.sendDataToServer();
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
-        console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
-    onClick() {
-        // plant the selected flower
-        flowers.push(new Flower('rose', this.position.get(), world));
+    keyPressed(key) {
+        if (keyCode == 32){
+            // plant the selected flower
+            this.flowerCollection.add(new Flower('rose', this.position.get(), world))
+            console.log(this.flowerCollection.toArray());
+        }
     }
 
     sendDataToServer() {
-        socket.emit("newPosition", {
-            position: this.position.get(),
-            rotation: this.rotation.get()
+        socket.emit("clientData", {
+            playerData : {
+                position: this.position.get(),
+                rotation: this.rotation.get()
+            },
+            flowerData: this.flowerCollection.toArray()
+
         });
     }
 }
