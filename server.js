@@ -8,6 +8,7 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 var users = {};
+var flowerData = {};
 
 app.set('port', 5941);
 
@@ -22,7 +23,7 @@ app.get('/', function(request, response) {
 });
 
 // Star listening on port 80 for web stuff
-server.listen(3000, function() {
+server.listen(8888, function() {
     console.log('starting webserver');
 });
 
@@ -44,22 +45,31 @@ io.on("connection", (socket) => {
     io.sockets.emit("newPlayer", socket.id);
     io.sockets.emit("update", users);
 
-    socket.on('newPosition', (position) =>
+    socket.on('clientData', (data) =>
     {
-        users[socket.id] = position
-        // socket.broadcast.emit('newPosition', position)
+        users[socket.id] = data.playerData;
+        for (var flowerId in data.flowerData)
+        {
+            flowerData[flowerId] = data.flowerData[flowerId]
+        }
+
+        console.log(flowerData);
     })
 
     socket.on("disconnect", () => {
         console.log(`Someone disconnected... ${socket.id}`);
         delete(users[socket.id]);
+        for (var flowerId in flowerData){
+            if (flowerId.includes(socket.id))
+            delete(flowerData[flowerId]);
+        }
         io.sockets.emit("playerLost", socket.id);
     });
 
 })
 
 setInterval(() => {
-    io.sockets.emit("update", users);
+    io.sockets.emit("update", {playerData: users, flowerData: flowerData});
     // console.log(users);
 
 }, 1000 / 60);
