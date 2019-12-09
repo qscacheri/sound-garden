@@ -21,18 +21,18 @@ class Flower {
         this.position = new Vector3(position);
 
         var container = new Container3D({x:position.x, y:position.y, z:position.z});
+        world.add(container);
+
         this.obj = new OBJ({
             scaleX: 1, scaleY: 1, scaleZ: 1,
             x: 0, y: 0, z: -.01,
             asset: type+"Obj",
             mtl: type+"Mtl"
         });
-
-        world.add(container);
-
         container.addChild(this.obj);
+
         container.spinY(world.getUserRotation().y)
-        console.log(world.getUserRotation().y);
+        //console.log(world.getUserRotation().y);
 
         var oscillatorType = "";
 

@@ -48,15 +48,24 @@ function setup() {
     });
     world.add(sky);
 
+    var box = new Box({
+    	x: 0, y: 1, z: 5,
+    	width: 1, height: 1, depth: 1
+    });
+    world.add(box);
+
     initialized = true;
 }
 
 function draw() {
     processServerData();
     player.move();
+    player.hover();
+    console.log(player.position.y);
 }
 
 function mousePressed() {
+	Tone.context.resume;
 }
 
 function processServerData()
@@ -70,7 +79,7 @@ function processServerData()
         if (idExists == false)
         {
             otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
-            console.log("Found new player...need to add");
+            //console.log("Found new player...need to add");
         }
 
         else
@@ -94,13 +103,14 @@ function keyPressed() {
     player.sendDataToServer();
 }
 
+
 class Player {
     constructor() {
         // keep track of player's rotation and position to send to the server
         this.position = new Vector3(random(-10, 10), 1, random(-10, 10));
         this.rotation = new Vector3(world.getUserRotation());
 
-        this.container = new Container3D({x: 0, y: 1, z: 5});
+        this.container = new Container3D({x: 0, y: 1.6, z: 5});
         world.add(this.container);
 
         this.flowerCollection = new FlowerCollection(myId);
@@ -114,16 +124,28 @@ class Player {
     }
 
     move() {
-        if (keyIsDown(87)) //w
+        if (keyIsDown(87)) // w key
             world.moveUserForward(.01);
-        if (keyIsDown(83))  //s
+        if (keyIsDown(83))  // s key
             world.moveUserForward(-.01);
 
-        this.position.set(world.getUserPosition());
+        this.position.x = world.getUserPosition().x;
+        this.position.z = world.getUserPosition().z;
         this.rotation.set(world.getUserRotation());
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
         this.sendDataToServer();
+
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
+        //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
+    }
+
+    hover() {
+    	if (this.position.y > 10.0)
+    		this.position.y -= 0.1;
+    	if (this.position.y <= 1.0)
+    		this.position.y += 0.1;
+
+
     }
 
     keyPressed(key) {
@@ -145,6 +167,7 @@ class Player {
         });
     }
 }
+
 
 class OtherPlayer {
     constructor(id) {
@@ -186,5 +209,4 @@ class OtherPlayer {
     destroy(){
         world.remove(this.avatar);
     }
-
 }
