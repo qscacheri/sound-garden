@@ -83,6 +83,7 @@ function processServerData()
 
     for (flowerId in serverData.flowerData)
     {
+        // console.log(flowerId);
         player.flowerCollection.addIfNotPresent(serverData.flowerData[flowerId]);
     }
 

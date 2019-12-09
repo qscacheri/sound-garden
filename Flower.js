@@ -1,10 +1,10 @@
 class Flower {
-    constructor(type, position, world) {
+    constructor(type, position, world, id) {
         // which constructor do we want to call (stupid js)
         if (typeof(position)!="undefined")
         {
             console.log("new flower from scratch");
-            this.fromScratch(type, position, world);
+            this.fromScratch(type, position, world, id);
 
         }
         else
@@ -14,14 +14,15 @@ class Flower {
         }
     }
 
-    fromScratch(type, position, world)
+    fromScratch(type, position, world, id)
     {
+        this.id = id;
         this.type = type;
         this.position = new Vector3(position);
 
         var container = new Container3D({x:position.x, y:position.y, z:position.z});
         this.obj = new OBJ({
-            scaleX: random(.001, .005), scaleY: random(.001, .005), scaleZ: random(.001, .005),
+            scaleX: 1, scaleY: 1, scaleZ: 1,
             x: 0, y: 0, z: -.01,
             asset: type+"Obj",
             mtl: type+"Mtl"
@@ -49,18 +50,20 @@ class Flower {
 
     fromPreExisting(flower)
     {
-        // debugger;
+        this.id = flower.id;
         this.type = flower.type;
         this.position = new Vector3(flower.position);
 
         this.obj = new OBJ({
-            scaleX: flower.scale.x, scaleY: flower.scale.y, scaleZ: flower.scale.z,
+            scaleX: 1, scaleY: 1, scaleZ: 1,
             x: flower.position.x, y: flower.position.y, z: flower.position.z,
             asset: flower.type+"Obj",
             mtl: flower.type+"Mtl"
         });
-        this.pitch = flower.pitch;
 
+        this.pitch = flower.pitch;
+        console.log(flower);
+        world.add(this.obj);
     }
 
     toJSON(identifier)
@@ -86,11 +89,21 @@ class FlowerCollection
         this.size = 0;
     }
 
-    add(newFlower){
-        var flowerId = this.id + this.size;
-        this.flowers[flowerId] = newFlower;
-        this.flowers[flowerId].id = flowerId; // flower collection object handles giving the flower an id
-        this.size++;
+    add(newFlower, alreadyHasId){
+        if (alreadyHasId == true)
+        {
+            var flowerId = newFlower.id;
+            this.flowers[flowerId] = newFlower;
+            this.size++;
+
+        }
+        else
+        {
+            var flowerId = this.id + this.size;
+            this.flowers[flowerId] = newFlower;
+            this.flowers[flowerId].id = flowerId; // flower collection object handles giving the flower an id
+            this.size++;
+        }
     }
 
     get(i)
@@ -100,12 +113,13 @@ class FlowerCollection
 
     addIfNotPresent(flowerAsJSON)
     {
+
         var flowerId = flowerAsJSON.id;
         var flowerExists = flowerId in this.flowers;
         if (flowerExists == false)
         {
-            debugger;
-            this.add(new Flower(flowerAsJSON));
+            console.log("missing flower with id: ", flowerId);
+            this.add(new Flower(flowerAsJSON), true);
         }
     }
 }
