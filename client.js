@@ -16,13 +16,14 @@ socket.on('connect', function() {
         player.initialize();
 });
 
-socket.on('update', function(otherPlayerInfo) {
+socket.on('update', function(newServerData) {
     //get the new data from the server
-    serverData = otherPlayerInfo;
+    serverData = newServerData;
 
 });
 
 socket.on('playerLost', function(lostPlayerId) {
+    otherPlayers[lostPlayerId].destroy();
     delete(otherPlayers[lostPlayerId]);
 });
 
@@ -34,7 +35,7 @@ function setup() {
     player = new Player();
 
     var ground = new Plane({
-        width: 50, height: 50,
+        width: 20, height: 20,
         red: 59, green: 133, blue: 13,
         rotationX: -90
     });
@@ -60,8 +61,9 @@ function mousePressed() {
 
 function processServerData()
 {
-    // console.log("Id exists?", idExists);
-    for (otherPlayerId in serverData)
+
+
+    for (otherPlayerId in serverData.playerData)
     {
         if (otherPlayerId == myId) continue;
         var idExists = otherPlayerId in otherPlayers;
@@ -73,9 +75,17 @@ function processServerData()
 
         else
         {
-            otherPlayers[otherPlayerId].setPositionAndRotation(serverData[otherPlayerId].position, serverData[otherPlayerId].rotation);
+            otherPlayers[otherPlayerId].setPositionAndRotation(serverData.playerData[otherPlayerId].position, serverData.playerData[otherPlayerId].rotation);
         }
     }
+
+    // console.log("flowerdata", serverData.flowerData);
+
+    for (flowerId in serverData.flowerData)
+    {
+        player.flowerCollection.addIfNotPresent(serverData.flowerData[flowerId]);
+    }
+
 }
 
 function keyPressed() {
@@ -86,13 +96,15 @@ function keyPressed() {
 class Player {
     constructor() {
         // keep track of player's rotation and position to send to the server
-        this.position = new Vector3(world.getUserRotation());
+        this.position = new Vector3(random(-10, 10), 1, random(-10, 10));
         this.rotation = new Vector3(world.getUserRotation());
 
         this.container = new Container3D({x: 0, y: 1, z: 5});
         world.add(this.container);
 
         this.flowerCollection = new FlowerCollection(myId);
+
+        world.setUserPosition(this.position.x, this.position.y, this.position.z);
     }
 
     initialize()
@@ -117,7 +129,7 @@ class Player {
         if (keyCode == 32){
             // plant the selected flower
             this.flowerCollection.add(new Flower('rose', this.position.get(), world))
-            console.log(this.flowerCollection.toArray());
+            console.log(this.flowerCollection.flowers);
         }
     }
 
@@ -127,7 +139,7 @@ class Player {
                 position: this.position.get(),
                 rotation: this.rotation.get()
             },
-            flowerData: this.flowerCollection.toArray()
+            flowerData: this.flowerCollection.flowers
 
         });
     }
@@ -140,25 +152,38 @@ class OtherPlayer {
         // keep track of other players' rotation and position to send to the server
         this.position = new Vector3(0, 1, 0);
         this.rotation = new Vector3(0, 0, 0);
-
         this.avatar = new Sphere({
             x: this.position.x, y: this.position.y, z: this.position.z,
             red: random(255), green: random(255), blue: random(255),
-            radius: 0.5
+            radius: 0.1
         });
+
+        this.shadow = new Cylinder({
+            x: this.position.x, y: .001, z: this.position.z,
+            red: 0, green: 0, blue: 0,
+            scaleX: .1, scaleY: .01, scaleZ: .1
+        });
+
     }
 
     setPositionAndRotation(position, rotation) {
         //make sure setup has run FIRST
         if (this.initialized == false && typeof(world) != "undefined") {
             world.add(this.avatar);
+            world.add(this.shadow);
             this.initialized = true;
         }
         this.position.set(position);
         this.rotation.set(rotation);
 
         this.avatar.setPosition(this.position.x, this.position.y, this.position.z);
-        this.avatar.setRotation(this.rotation.x, this.rotation.y, this.rotation.z)
+        this.avatar.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
+
+        this.shadow.setPosition(this.position.x, .00001, this.position.z);
+    }
+
+    destroy(){
+        world.remove(this.avatar);
     }
 
 }

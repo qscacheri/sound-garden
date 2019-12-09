@@ -8,7 +8,7 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 var users = {};
-var flowers = {};
+var flowerData = {};
 
 app.set('port', 5941);
 
@@ -48,23 +48,28 @@ io.on("connection", (socket) => {
     socket.on('clientData', (data) =>
     {
         users[socket.id] = data.playerData;
-        for (var i = 0; i < data.flowerData.length; i++){
-            flowers[data.flowerData[i].id] = data.flowerData[i];
-            console.log(flowers[data.flowerData[i].id]);
+        for (var flowerId in data.flowerData)
+        {
+            flowerData[flowerId] = data.flowerData[flowerId]
         }
-        // console.log(data.flowerData);
+
+        // console.log(flowerData);
     })
 
     socket.on("disconnect", () => {
         console.log(`Someone disconnected... ${socket.id}`);
         delete(users[socket.id]);
+        for (var flowerId in flowerData){
+            if (flowerId.includes(socket.id))
+            delete(flowerData[flowerId]);
+        }
         io.sockets.emit("playerLost", socket.id);
     });
 
 })
 
 setInterval(() => {
-    io.sockets.emit("update", users);
+    io.sockets.emit("update", {playerData: users, flowerData: flowerData});
     // console.log(users);
 
 }, 1000 / 60);
