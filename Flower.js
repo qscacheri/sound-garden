@@ -15,7 +15,7 @@ class Flower {
         this.id = id;
         this.type = type;
         this.position = new Vector3(position);
-
+        this.sample = Math.floor(random(8));
         var container = new Container3D({
             x: position.x,
             y: position.y,
@@ -38,26 +38,13 @@ class Flower {
         container.spinY(world.getUserRotation().y)
         //console.log(world.getUserRotation().y);
         Tone.context.resume();
-        console.log(player);
-
-        // var oscillatorType = "";
-        //
-        // if (type=="rose"){
-        //     oscillatorType = "sine"
-        // }
-        //
-        // this.pitch = MAJOR_FREQUENCIES[Math.floor(random(14))][Math.floor(random(3))];
-        // this.oscillator = new Tone.Oscillator(this.pitch, oscillatorType);
-        // this.oscillator.connect(this.panner);
-        // this.oscillator.start();
 
         this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
         this.panner.toMaster();
 
-        this.player = new Tone.Player("./assets/audio_files/0.wav");
+        this.player = new Tone.Player("./assets/audio_files/" + this.sample + ".wav");
         this.player.autostart = true;
         this.player.loop = true;
-        this.player.volume = -12;
         this.player.connect(this.panner);
 
 
@@ -80,7 +67,7 @@ class Flower {
             mtl: flower.type + "Mtl"
         });
 
-        this.pitch = flower.pitch;
+        this.sample = flower.sample;
         world.add(this.obj);
     }
 
@@ -89,7 +76,7 @@ class Flower {
             type: this.type,
             position: this.position.get(),
             scale: this.obj.getScale(),
-            pitch: this.pitch,
+            sample: this.sample,
             id: identifier
         };
 
