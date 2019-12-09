@@ -20,21 +20,6 @@ socket.on('update', function(otherPlayerInfo) {
 
 });
 
-// socket.on('newPlayer', function(newPlayerId) {
-//     // a new player needs to be added
-//     if (newPlayerId == myId) {
-//         for (var playerId in serverData) {
-//             if (playerId === myId) //don't add yourself!
-//                 continue;
-//             otherPlayers[playerId] = new OtherPlayer(playerId);
-//         }
-//     }
-//     else {
-//             console.log("gained a new player, ", newPlayerId);
-//         otherPlayers[newPlayerId] = new OtherPlayer(newPlayerId);
-//     }
-// });
-
 socket.on('playerLost', function(lostPlayerId) {
     delete(otherPlayers[lostPlayerId]);
 });
@@ -60,15 +45,24 @@ function setup() {
     });
     world.add(sky);
 
+    var box = new Box({
+    	x: 0, y: 1, z: 5,
+    	width: 1, height: 1, depth: 1
+    });
+    world.add(box);
+
     initialized = true;
 }
 
 function draw() {
     processServerData();
     player.move();
+    player.hover();
+    console.log(player.position.y);
 }
 
 function mousePressed() {
+	Tone.context.resume;
 }
 
 function processServerData()
@@ -81,11 +75,10 @@ function processServerData()
         if (idExists == false)
         {
             otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
-            console.log("Found new player...need to add");
+            //console.log("Found new player...need to add");
         }
 
-        else
-        {
+        else {
             otherPlayers[otherPlayerId].setPositionAndRotation(serverData[otherPlayerId].position, serverData[otherPlayerId].rotation);
         }
     }
@@ -97,29 +90,41 @@ function keyPressed() {
     player.sendDataToServer();
 }
 
+
 class Player {
     constructor() {
         // keep track of player's rotation and position to send to the server
-        this.position = new Vector3(world.getUserRotation());
+        this.position = new Vector3(random(25), 1.0, random(25));
+        world.setUserPosition(this.position.x, this.position.y,this.position.z);
         this.rotation = new Vector3(world.getUserRotation());
 
-        this.container = new Container3D({x: 0, y: 1, z: 5});
+        this.container = new Container3D({x: 0, y: 1.6, z: 5});
         world.add(this.container);
-        // this.container.addChild(sunflower);
     }
 
     move() {
-        if (keyIsDown(87)) //w
+        if (keyIsDown(87)) // w key
             world.moveUserForward(.01);
-        if (keyIsDown(83))  //s
+        if (keyIsDown(83))  // s key
             world.moveUserForward(-.01);
 
-        this.position.set(world.getUserPosition());
+        this.position.x = world.getUserPosition().x;
+        this.position.z = world.getUserPosition().z;
         this.rotation.set(world.getUserRotation());
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
         this.sendDataToServer();
+
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
-        console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
+        //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
+    }
+
+    hover() {
+    	if (this.position.y > 10.0)
+    		this.position.y -= 0.1;
+    	if (this.position.y <= 1.0)
+    		this.position.y += 0.1;
+
+
     }
 
     onClick() {
@@ -128,12 +133,14 @@ class Player {
     }
 
     sendDataToServer() {
+    	// console.log(this.position.get());
         socket.emit("newPosition", {
             position: this.position.get(),
             rotation: this.rotation.get()
         });
     }
 }
+
 
 class OtherPlayer {
     constructor(id) {
@@ -162,5 +169,4 @@ class OtherPlayer {
         this.avatar.setPosition(this.position.x, this.position.y, this.position.z);
         this.avatar.setRotation(this.rotation.x, this.rotation.y, this.rotation.z)
     }
-
 }
