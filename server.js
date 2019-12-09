@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
             flowerData[flowerId] = data.flowerData[flowerId]
         }
 
-        console.log(flowerData);
     })
 
     socket.on("disconnect", () => {

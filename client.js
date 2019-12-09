@@ -61,7 +61,6 @@ function draw() {
     processServerData();
     player.move();
     player.hover();
-    console.log(player.position.y);
 }
 
 function mousePressed() {
