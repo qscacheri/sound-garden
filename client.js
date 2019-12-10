@@ -45,10 +45,6 @@ function setup() {
 
     })
 
-    rainSound.play();
-    rainSound.loop();
-
-
     world.add(garden);
 
     var ground = new Plane({
@@ -90,7 +86,7 @@ function draw() {
 
 function mousePressed() {
     Tone.context.resume;
-    if (!rainSound.isLooping)
+    if (!rainSound.isPlaying)
         rainSound.loop();
 }
 
@@ -124,7 +120,7 @@ function keyPressed() {
 class Player {
     constructor() {
         // keep track of player's rotation and position to send to the server
-        this.position = new Vector3(random(-10, 10), 1, random(-10, 10));
+        this.position = new Vector3(random(-8, 8), 1, random(-8, 8));
         this.rotation = new Vector3(world.getUserRotation());
 
         this.container = new Container3D({
@@ -257,9 +253,10 @@ class RainDrop {
             red: 255,
             green: 255,
             blue: 255,
-            x: random(-10, 10),
+            opacity: .3,
+            x: random(player.position.x - 3, player.position.x + 3),
             y: random(20, 30),
-            z: random(-10, -10)
+            z: random(player.position.z - 3, player.position.z + 3),
         })
         // this.speedX = random(-.5, .5);
         this.speedY = random(-.5, -.8);
@@ -272,7 +269,7 @@ class RainDrop {
         else return false;
     }
     reset() {
-        this.sphere.setPosition(random(-10, 10), random(20, 30), random(-10, 10));
+        this.sphere.setPosition(random(player.position.x - 3, player.position.x + 3), random(20, 30), random(player.position.z - 3, player.position.z + 3));
         this.speedY = random(-.1, -.5);
     }
 }
