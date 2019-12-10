@@ -70,24 +70,6 @@ function setup() {
     });
     world.add(box);
 
-    // var garden = new OBJ({
-    //     scaleX: 1, scaleY: 1, scaleZ: 1,
-    //     asset: "gardenOBJ",
-    //     mtl: "gardenMTL"
-    // });
-    // world.add(garden);
-
-    // for (var i = 0; i < 50; i++) {
-    //     var grass = new Plane({
-    //         width: 3, height: 0.5,
-    //         x: random(-8, 8), y: 0.25, z: random(-8, 8),
-    //         asset: "grass",
-    //         side: "double", transparent: true
-    //     });
-    //     world.add(grass);
-    // }
-
-
 
     initialized = true;
 }
@@ -193,7 +175,7 @@ class Player {
     keyPressed(key) {
         if (keyCode == 32) {
             // plant the selected flower
-            this.flowerCollection.add(new Flower("rose", this.position.get(), world))
+            this.flowerCollection.add(new Flower("rose", {x: this.position.x, y: 1, z: this.position.z}, world))
             console.log(this.flowerCollection.flowers);
         }
     }

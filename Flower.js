@@ -29,7 +29,7 @@ class Flower {
             scaleZ: 1,
             x: 0,
             y: 0,
-            z: -.01,
+            z: -1,
             asset: type + "Obj",
             mtl: type + "Mtl"
         });
