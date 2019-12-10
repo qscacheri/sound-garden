@@ -16,6 +16,7 @@ class Flower {
         this.type = type;
         this.position = new Vector3(position);
         this.sample = Math.floor(random(8));
+
         var container = new Container3D({
             x: position.x,
             y: position.y,
@@ -23,16 +24,32 @@ class Flower {
         });
         world.add(container);
 
-        this.obj = new OBJ({
-            scaleX: 1,
-            scaleY: 1,
-            scaleZ: 1,
-            x: 0,
-            y: 0,
-            z: -1,
-            asset: type + "Obj",
-            mtl: type + "Mtl"
-        });
+        if (this.type == "heliconia") {
+            this.obj = new OBJ({
+                scaleX: 0.1,
+                scaleY: 0.1,
+                scaleZ: 0.1,
+                x: 0,
+                y: 1,
+                z: -1,
+                rotationX: 180,
+                asset: type + "Obj",
+                mtl: type + "Mtl"
+            });
+        }
+
+        else {
+            this.obj = new OBJ({
+                scaleX: 1,
+                scaleY: 1,
+                scaleZ: 1,
+                x: 0,
+                y: 0,
+                z: -1,
+                asset: type + "Obj",
+                mtl: type + "Mtl"
+            });
+        }
         container.addChild(this.obj);
 
         container.spinY(world.getUserRotation().y)
@@ -94,7 +111,7 @@ class Flower {
     }
 }
 
-Flower.types = ["rose", "sunflower", "dandelion", "white", "mushroom"];
+Flower.types = ["rose", "dandelion", "sunflower", "heliconia"];
 
 class FlowerCollection {
     constructor(id) {

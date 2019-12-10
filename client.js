@@ -39,6 +39,7 @@ socket.on('playerLost', function(lostPlayerId) {
 });
 
 ///////////////////////////////////////////////////////////////////////////
+
 function preload()
 {
     rainSound = loadSound("assets/audio_files/rain_short.wav");
@@ -47,15 +48,15 @@ function preload()
 function setup() {
     world = new World('VRScene');
     world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
+    
     player = new Player();
     rainSound.loop();
     rainSystem = new RainSystem();
+
     var garden = new OBJ({
         asset: "gardenObj",
         mtl: "gardenMtl"
-
-    })
-
+    });
     world.add(garden);
 
     var ground = new Plane({
@@ -124,8 +125,6 @@ function setup() {
     //     red: 200, green: 0, blue: 0
     // })
     // world.add(zPos);
-
-
 
     initialized = true;
 }
@@ -199,9 +198,9 @@ class Player {
 
         if (this.position.x > -8 && this.position.x < 8 && this.position.z > -6 && this.position.z < 8) {
             if (keyIsDown(87)) // w key
-                world.moveUserForward(.1);
+                world.moveUserForward(.01);
             if (keyIsDown(83)) // s key
-                world.moveUserForward(-.1);
+                world.moveUserForward(-.01);
         }
         else {
             console.log("out of bounds");
@@ -216,8 +215,6 @@ class Player {
 
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
         Tone.Listener.setOrientation(this.rotation.x, this.rotation.y, this.rotation.z, 0, 0, 1);
-
-        //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
     // hover() {
@@ -229,13 +226,13 @@ class Player {
     // }
 
     keyPressed(key) {
-        if (keyCode == 32) {
-
+        if (keyCode == 32) { //spacebar
+            // select a flower type
             var type = Flower.types[Math.floor(random(Flower.types.length))];
 
             // plant the selected flower
-            this.flowerCollection.add(new Flower(type, {x: this.position.x, y: 1, z: this.position.z}, world))
-            console.log(this.flowerCollection.flowers);
+            this.flowerCollection.add(new Flower(type, {x: this.position.x, y: 1, z: this.position.z}, world));
+            // console.log(this.flowerCollection.flowers);
         }
     }
 
