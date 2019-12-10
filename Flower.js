@@ -93,6 +93,8 @@ class Flower {
     }
 }
 
+Flower.types = ["rose", "sunflower", "dandelion", "white", "mushroom"];
+
 class FlowerCollection {
     constructor(id) {
         this.id = id;

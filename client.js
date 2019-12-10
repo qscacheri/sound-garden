@@ -64,11 +64,33 @@ function setup() {
     });
     world.add(sky);
 
-    var box = new Box({
+    // var box = new Box({
+    //     x: 0, y: 1, z: 0,
+    //     width: 1, height: 1, depth: 1
+    // });
+    // world.add(box);
+
+    var textContainer = new Container3D({
         x: 0, y: 1, z: 0,
-        width: 1, height: 1, depth: 1
     });
-    world.add(box);
+    world.add(textContainer);
+    
+    var textHolder = new Plane({
+        x: 0, y: 0.5, z: 1,
+        width: 1, height: 0.5,
+        red: 150, green: 126, blue: 95
+    });
+    textContainer.addChild(textHolder);
+
+    var sign = new OBJ({
+        x: 0, y: 0.5, z: 0.01,
+        rotationY: 180,
+        asset: "signObj", mtl: "signMtl"
+    });
+    textContainer.addChild(sign);
+
+    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(0,0,0); align: center;');
+
 
 
     initialized = true;
@@ -78,7 +100,7 @@ function draw() {
     processServerData();
     player.move();
     rainSystem.render();
-    player.hover();
+    // player.hover();
 }
 
 function mousePressed() {
@@ -121,7 +143,7 @@ class Player {
         // keep track of player's rotation and position to send to the server
         this.position = new Vector3(random(-8, 8), 1, random(-8, 8));
         this.rotation = new Vector3(world.getUserRotation());
-        this.direction = 1;
+        this.direction = -1;
 
         this.container = new Container3D({
             x: 0,
@@ -140,13 +162,13 @@ class Player {
     }
 
     move() {
-        console.log(this.position.x, ",", this.position.z);
+        // console.log(this.position.x, ",", this.position.z);
 
         if (this.position.x > -9 && this.position.x < 9 && this.position.z > -9 && this.position.z < 9) {
             if (keyIsDown(87)) // w key
-                world.moveUserForward(.01);
+                world.moveUserForward(.1);
             if (keyIsDown(83)) // s key
-                world.moveUserForward(-.01);
+                world.moveUserForward(-.1);
         } else {
             // world.moveUserForward(-.01);
         }
@@ -163,19 +185,21 @@ class Player {
         //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
-    hover() {
-    	if (this.position.y > 10.0)
-    		this.direction = -1;
-    	if (this.position.y <= 1.0)
-    		this.direction = 1;
-
-        this.position.y += 0.1 * this.direction;
-    }
+    // hover() {
+    // 	if (this.position.y > 2.0)
+    // 		this.direction = -1;
+    //     if (this.position.y <= 1.0)
+    //         this.direction = 1;
+    //     this.position.y += 0.1 * this.direction;
+    // }
 
     keyPressed(key) {
         if (keyCode == 32) {
+
+            var type = Flower.types[Math.floor(random(Flower.types.length))];
+
             // plant the selected flower
-            this.flowerCollection.add(new Flower("rose", {x: this.position.x, y: 1, z: this.position.z}, world))
+            this.flowerCollection.add(new Flower(type, {x: this.position.x, y: 1, z: this.position.z}, world))
             console.log(this.flowerCollection.flowers);
         }
     }
