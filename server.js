@@ -61,7 +61,9 @@ io.on("connection", (socket) => {
         for (var flowerId in flowerData){
             if (flowerId.includes(socket.id))
             delete(flowerData[flowerId]);
+            console.log("flower deleted");
         }
+        console.log(flowerData);
         io.sockets.emit("playerLost", socket.id);
     });
 
