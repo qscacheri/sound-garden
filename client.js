@@ -142,6 +142,8 @@ class Player {
         this.sendDataToServer();
 
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
+        Tone.Listener.setOrientation(this.rotation.x, this.rotation.y, this.rotation.z, 0, 0, 1);
+
         //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
