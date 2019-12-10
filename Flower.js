@@ -109,6 +109,9 @@ class Flower {
 
         return jsonFlower;
     }
+    destroy(){
+        world.remove(this.obj);
+    }
 }
 
 Flower.types = ["rose", "dandelion", "sunflower", "heliconia"];
@@ -136,6 +139,18 @@ class FlowerCollection {
 
     get(i) {
         return this.flowers[i];
+    }
+
+    destroy(playerId)
+    {
+        for (var id in flowers)
+        {
+            if (id.includes("playerId"))
+            {
+                flowers[id].destroy();
+                delete(flowers[id]);
+            }
+        }
     }
 
     addIfNotPresent(flowerAsJSON) {

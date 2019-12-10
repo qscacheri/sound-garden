@@ -36,27 +36,26 @@ socket.on('update', function(newServerData) {
 socket.on('playerLost', function(lostPlayerId) {
     otherPlayers[lostPlayerId].destroy();
     delete(otherPlayers[lostPlayerId]);
+    flowerCollection.destroy(lostPlayerId);
 });
 
 ///////////////////////////////////////////////////////////////////////////
-
-function preload()
-{
+function preload() {
     rainSound = loadSound("assets/audio_files/rain_short.wav");
 }
 
 function setup() {
     world = new World('VRScene');
     world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
-    
     player = new Player();
     rainSound.loop();
     rainSystem = new RainSystem();
-
     var garden = new OBJ({
         asset: "gardenObj",
         mtl: "gardenMtl"
-    });
+
+    })
+
     world.add(garden);
 
     var ground = new Plane({
@@ -78,23 +77,33 @@ function setup() {
     world.add(sky);
 
     signContainer = new Container3D({
-        x: 0, y: 0, z: 0,
+        x: 0,
+        y: 0,
+        z: 0,
     });
     world.add(signContainer);
 
     textHolder = new Plane({
-        x: 0, y: 1.6, z: .05,
-        width: .0001, height: .0001,
+        x: 0,
+        y: 1.6,
+        z: .05,
+        width: .0001,
+        height: .0001,
         // red: 142, green: 102, blue: 80
-        red: 0, green: 0, blue: 0
+        red: 0,
+        green: 0,
+        blue: 0
 
     });
     signContainer.addChild(textHolder);
     // world.add(textHolder);
     var sign = new OBJ({
-        x: 0, y: 1.5, z: 0,
+        x: 0,
+        y: 1.5,
+        z: 0,
         rotationY: 180,
-        asset: "signObj", mtl: "signMtl"
+        asset: "signObj",
+        mtl: "signMtl"
     });
     signContainer.addChild(sign);
     // world.add(sign);
@@ -126,6 +135,8 @@ function setup() {
     // })
     // world.add(zPos);
 
+
+
     initialized = true;
 }
 
@@ -150,9 +161,7 @@ function processServerData() {
         if (idExists == false) {
             otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
             //console.log("Found new player...need to add");
-        }
-
-        else {
+        } else {
             otherPlayers[otherPlayerId].setPositionAndRotation(serverData.playerData[otherPlayerId].position, serverData.playerData[otherPlayerId].rotation);
         }
     }
@@ -196,16 +205,10 @@ class Player {
     move() {
         // console.log(this.position.x, ",", this.position.z);
 
-        if (this.position.x > -8 && this.position.x < 8 && this.position.z > -6 && this.position.z < 8) {
-            if (keyIsDown(87)) // w key
-                world.moveUserForward(.01);
-            if (keyIsDown(83)) // s key
-                world.moveUserForward(-.01);
-        }
-        else {
-            console.log("out of bounds");
+        if (keyIsDown(87)) // w key
+            world.moveUserForward(.1);
+        if (keyIsDown(83)) // s key
             world.moveUserForward(-.1);
-        }
 
         this.position.x = world.getUserPosition().x;
         this.position.z = world.getUserPosition().z;
@@ -213,8 +216,31 @@ class Player {
         this.container.setRotation(this.rotation.x, this.rotation.y, this.rotation.z);
         this.sendDataToServer();
 
+        if (this.position.x <= -8) {
+            this.position.x = -7;
+            world.setUserPosition(this.position.x, this.position.y, this.position.z)
+        }
+
+        if (this.position.x >= 8) {
+            this.position.x = 7;
+            world.setUserPosition(this.position.x, this.position.y, this.position.z)
+        }
+
+        if (this.position.z <= -6) {
+            this.position.z = -5;
+            world.setUserPosition(this.position.x, this.position.y, this.position.z)
+        }
+
+        if (this.position.z >= 8) {
+            this.position.z = 7;
+            world.setUserPosition(this.position.x, this.position.y, this.position.z)
+        }
+        console.log(world.getUserPosition());
+
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
         Tone.Listener.setOrientation(this.rotation.x, this.rotation.y, this.rotation.z, 0, 0, 1);
+
+        //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
     // hover() {
@@ -226,13 +252,17 @@ class Player {
     // }
 
     keyPressed(key) {
-        if (keyCode == 32) { //spacebar
-            // select a flower type
+        if (keyCode == 32) {
+
             var type = Flower.types[Math.floor(random(Flower.types.length))];
 
             // plant the selected flower
-            this.flowerCollection.add(new Flower(type, {x: this.position.x, y: 1, z: this.position.z}, world));
-            // console.log(this.flowerCollection.flowers);
+            this.flowerCollection.add(new Flower(type, {
+                x: this.position.x,
+                y: 1,
+                z: this.position.z
+            }, world))
+            console.log(this.flowerCollection.flowers);
         }
     }
 
