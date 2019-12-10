@@ -19,7 +19,7 @@ app.use('/', express.static(__dirname + '/'));
 
 // What file to send users
 app.get('/', function(request, response) {
-    response.sendFile(path.join(__dirname, 'client.html'));
+    response.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Star listening on port 80 for web stuff
