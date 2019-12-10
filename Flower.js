@@ -36,10 +36,10 @@ class Flower {
         container.addChild(this.obj);
 
         container.spinY(world.getUserRotation().y)
-        //console.log(world.getUserRotation().y);
         Tone.context.resume();
 
         this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
+        this.panner.setOrientation(world.getUserRotation().x, world.getUserRotation().y, world.getUserRotation().z);
         this.panner.toMaster();
 
         this.player = new Tone.Player("./assets/audio_files/" + this.sample + ".wav");
@@ -71,6 +71,7 @@ class Flower {
         world.add(this.obj);
 
         this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
+        this.panner.setOrientation(world.getUserRotation().x, world.getUserRotation().y, world.getUserRotation().z);
         this.panner.toMaster();
 
         this.player = new Tone.Player("./assets/audio_files/" + this.sample + ".wav");

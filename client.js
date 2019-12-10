@@ -9,6 +9,17 @@ var world;
 var initialized = false;
 var rainSystem;
 var rainSound;
+var liveValue;
+var textHolder;
+var signContainer;
+var sky;
+
+// document.getElementById("live").onchange = function(){
+//     liveValue = document.getElementById("live").value;
+//     console.log(liveValue);
+//     textHolder.setZ(liveValue);
+//     console.log(textHolder);
+// }
 
 socket.on('connect', function() {
     myId = socket.id;
@@ -37,7 +48,7 @@ function setup() {
     world = new World('VRScene');
     world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
     player = new Player();
-
+    rainSound.loop();
     rainSystem = new RainSystem();
     var garden = new OBJ({
         asset: "gardenObj",
@@ -57,39 +68,62 @@ function setup() {
     });
     world.add(ground);
 
-    var sky = new Sphere({
+    sky = new Sphere({
         radius: 100,
         asset: "sky",
-        side: "back"
+        side: "back",
+        y: -80
     });
     world.add(sky);
 
-    // var box = new Box({
-    //     x: 0, y: 1, z: 0,
-    //     width: 1, height: 1, depth: 1
-    // });
-    // world.add(box);
-
-    var textContainer = new Container3D({
-        x: 0, y: 1, z: 0,
+    signContainer = new Container3D({
+        x: 0, y: 0, z: 0,
     });
-    world.add(textContainer);
-    
-    var textHolder = new Plane({
-        x: 0, y: 0.5, z: 1,
-        width: 1, height: 0.5,
-        red: 150, green: 126, blue: 95
-    });
-    textContainer.addChild(textHolder);
+    world.add(signContainer);
 
+    textHolder = new Plane({
+        x: 0, y: 1.6, z: .05,
+        width: .0001, height: .0001,
+        // red: 142, green: 102, blue: 80
+        red: 0, green: 0, blue: 0
+
+    });
+    signContainer.addChild(textHolder);
+    // world.add(textHolder);
     var sign = new OBJ({
-        x: 0, y: 0.5, z: 0.01,
+        x: 0, y: 1.5, z: 0,
         rotationY: 180,
         asset: "signObj", mtl: "signMtl"
     });
-    textContainer.addChild(sign);
+    signContainer.addChild(sign);
+    // world.add(sign);
+    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(255,255,255); align: center; width: 3.4em;');
+    console.log(textHolder.tag);
 
-    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(0,0,0); align: center;');
+    // used for boundary testing
+    // var xNeg = new Box({
+    //     x: -5, y: .5, z: 0,
+    //     red: 0, green: 0, blue: 255
+    // })
+    // world.add(xNeg);
+    //
+    // var xPos = new Box({
+    //     x: 5, y: .5, z: 0,
+    //     red: 100, green: 0, blue: 255
+    // })
+    // world.add(xPos);
+    //
+    // var zNeg = new Box({
+    //     x: 0, y: .5, z: -5,
+    //     red: 200, green: 100, blue: 255
+    // })
+    // world.add(zNeg);
+    //
+    // var zPos = new Box({
+    //     x: 0, y: .5, z: 5,
+    //     red: 200, green: 0, blue: 0
+    // })
+    // world.add(zPos);
 
 
 
@@ -97,16 +131,17 @@ function setup() {
 }
 
 function draw() {
+    sky.spinY(.01);
     processServerData();
     player.move();
     rainSystem.render();
     // player.hover();
+    signContainer.spinY(.1);
 }
 
 function mousePressed() {
     Tone.context.resume;
-    if (!rainSound.isPlaying)
-        rainSound.loop();
+    getAudioContext().resume()
 }
 
 function processServerData() {
@@ -122,8 +157,6 @@ function processServerData() {
             otherPlayers[otherPlayerId].setPositionAndRotation(serverData.playerData[otherPlayerId].position, serverData.playerData[otherPlayerId].rotation);
         }
     }
-
-    // console.log("flowerdata", serverData.flowerData);
 
     for (flowerId in serverData.flowerData) {
         // console.log(flowerId);
@@ -164,13 +197,15 @@ class Player {
     move() {
         // console.log(this.position.x, ",", this.position.z);
 
-        if (this.position.x > -9 && this.position.x < 9 && this.position.z > -9 && this.position.z < 9) {
+        if (this.position.x > -8 && this.position.x < 8 && this.position.z > -6 && this.position.z < 8) {
             if (keyIsDown(87)) // w key
                 world.moveUserForward(.1);
             if (keyIsDown(83)) // s key
                 world.moveUserForward(-.1);
-        } else {
-            // world.moveUserForward(-.01);
+        }
+        else {
+            console.log("out of bounds");
+            world.moveUserForward(-.1);
         }
 
         this.position.x = world.getUserPosition().x;
