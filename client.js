@@ -65,14 +65,29 @@ function setup() {
     world.add(sky);
 
     var box = new Box({
-        x: 0,
-        y: 1,
-        z: 5,
-        width: 1,
-        height: 1,
-        depth: 1
+        x: 0, y: 1, z: 0,
+        width: 1, height: 1, depth: 1
     });
     world.add(box);
+
+    // var garden = new OBJ({
+    //     scaleX: 1, scaleY: 1, scaleZ: 1,
+    //     asset: "gardenOBJ",
+    //     mtl: "gardenMTL"
+    // });
+    // world.add(garden);
+
+    // for (var i = 0; i < 50; i++) {
+    //     var grass = new Plane({
+    //         width: 3, height: 0.5,
+    //         x: random(-8, 8), y: 0.25, z: random(-8, 8),
+    //         asset: "grass",
+    //         side: "double", transparent: true
+    //     });
+    //     world.add(grass);
+    // }
+
+
 
     initialized = true;
 }
@@ -97,7 +112,9 @@ function processServerData() {
         if (idExists == false) {
             otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
             //console.log("Found new player...need to add");
-        } else {
+        }
+
+        else {
             otherPlayers[otherPlayerId].setPositionAndRotation(serverData.playerData[otherPlayerId].position, serverData.playerData[otherPlayerId].rotation);
         }
     }
@@ -122,6 +139,7 @@ class Player {
         // keep track of player's rotation and position to send to the server
         this.position = new Vector3(random(-8, 8), 1, random(-8, 8));
         this.rotation = new Vector3(world.getUserRotation());
+        this.direction = 1;
 
         this.container = new Container3D({
             x: 0,
@@ -164,18 +182,18 @@ class Player {
     }
 
     hover() {
-        if (this.position.y > 10.0)
-            this.position.y -= 0.1;
-        if (this.position.y <= 1.0)
-            this.position.y += 0.1;
+    	if (this.position.y > 10.0)
+    		this.direction = -1;
+    	if (this.position.y <= 1.0)
+    		this.direction = 1;
 
-
+        this.position.y += 0.1 * this.direction;
     }
 
     keyPressed(key) {
         if (keyCode == 32) {
             // plant the selected flower
-            this.flowerCollection.add(new Flower('rose', this.position.get(), world))
+            this.flowerCollection.add(new Flower("rose", this.position.get(), world))
             console.log(this.flowerCollection.flowers);
         }
     }
