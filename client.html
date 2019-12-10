@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <script src="frequencies.js" charset="utf-8"></script>
+        <script src="vector3.js" charset="utf-8"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="./p5/p5.min.js"></script>
+        <script src="./p5/p5.dom.min.js"></script>
+        <script src="./p5/p5.sound.min.js"></script>
+        <script src="./Tone.js"></script>
+        <script language="javascript" type="text/javascript" src="./aframe/aframe.min.js"></script>
+        <script language="javascript" type="text/javascript" src="./aframe/aframep5.js"></script>
+    </head>
+
+    <body>
+
+        <a-scene id = "VRScene">
+            <a-assets id = "VRAssets">
+                <img id = "sky" src="assets/sky.png">
+
+                <!-- garden -->
+                <a-asset id="gardenObj" src="/assets/garden/garden.obj"></a-asset>
+                <a-asset id="gardenMtl" src="/assets/garden/garden.mtl"></a-asset>
+
+                <!-- sign -->
+                <a-asset id="signObj" src="/assets/sign/sign.obj"></a-asset>
+                <a-asset id="signMtl" src="/assets/sign/sign.mtl"></a-asset>
+
+                <!-- flowers -->
+                <a-asset id="sunflowerObj" src="/assets/sunflower/sunflower.obj"></a-asset>
+                <a-asset id="sunflowerMtl" src="/assets/sunflower/sunflower.mtl"></a-asset>
+
+                <a-asset id="mushroomObj" src="/assets/shroom/shroom.obj"></a-asset>
+                <a-asset id="mushroomMtl" src="/assets/shroom/shroom.mtl"></a-asset>
+
+                <a-asset id="roseObj" src="/assets/rose/rose.obj"></a-asset>
+                <a-asset id="roseMtl" src="/assets/rose/rose.mtl"></a-asset>
+
+                <!-- <a-asset id="desertLilyObj" src="/assets/desert_lily/desertLily.obj"></a-asset>
+                <a-asset id="desertLilyMtl" src="/assets/desert_lily/desertLily.mtl"></a-asset>
+              -->
+
+                <a-asset id="dandelionObj" src="/assets/dandelion/dandelion.obj"></a-asset>
+                <a-asset id="dandelionMtl" src="/assets/dandelion/dandelion.mtl"></a-asset>
+
+                <a-asset id="whiteObj" src="/assets/white_flower/white.obj"></a-asset>
+                <a-asset id="whiteMtl" src="/assets/white_flower/white.mtl"></a-asset>
+            </a-assets>
+        </a-scene>
+
+        <!-- <div style="position: absolute; left: 10px; top: 10px;">
+            <input id = "live" type="number" min="0" max="1000" value=".0005">
+        </div> -->
+
+        <script src="./Flower.js"></script>
+        <script src="client.js" charset="utf-8"></script>
+
+    </body>
+</html>
