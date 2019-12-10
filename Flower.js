@@ -25,26 +25,32 @@ class Flower {
 
         this.obj = new OBJ({
             scaleX: 1, scaleY: 1, scaleZ: 1,
-            x: 0, y: 0, z: -.01,
+            x: 0, y: 0, z: -2,
             asset: type+"Obj",
             mtl: type+"Mtl"
         });
         container.addChild(this.obj);
-
         container.spinY(world.getUserRotation().y)
-        //console.log(world.getUserRotation().y);
 
-        var oscillatorType = "";
+        // var oscillatorType = "";
+        // if (type=="rose"){
+        //     oscillatorType = "sine"
+        // }
 
-        if (type=="rose"){
-            oscillatorType = "sine"
-        }
-
-        this.pitch = MAJOR_FREQUENCIES[Math.floor(random(14))][Math.floor(random(3))];
-        this.oscillator = new Tone.Oscillator(this.pitch, oscillatorType);
+        // this.pitch = MAJOR_FREQUENCIES[Math.floor(random(14))][Math.floor(random(3))];
+        // this.oscillator = new Tone.Oscillator(this.pitch, oscillatorType);
         this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
-        this.oscillator.connect(this.panner);
-        this.oscillator.start();
+        // this.oscillator.connect(this.panner);
+        // this.oscillator.start();
+
+        this.buffer = new Tone.Buffer("assets/audio_files/0.wav", function(){
+            var buf = this.buffer.get();
+            this.source = new Tone.BufferSource(buf);
+            this.source.loop = true;
+            // this.source.connect(this.panner);
+            this.source.start();
+            this.source.toMaster();
+        });
         // this.panner.toMaster();
     }
 

@@ -49,10 +49,29 @@ function setup() {
     world.add(sky);
 
     var box = new Box({
-    	x: 0, y: 1, z: 5,
-    	width: 1, height: 1, depth: 1
+        x: 0, y: 1, z: 0,
+        width: 1, height: 1, depth: 1
     });
     world.add(box);
+
+    // var garden = new OBJ({
+    //     scaleX: 1, scaleY: 1, scaleZ: 1,
+    //     asset: "gardenOBJ",
+    //     mtl: "gardenMTL"
+    // });
+    // world.add(garden);
+
+    // for (var i = 0; i < 50; i++) {
+    //     var grass = new Plane({
+    //         width: 3, height: 0.5,
+    //         x: random(-8, 8), y: 0.25, z: random(-8, 8),
+    //         asset: "grass",
+    //         side: "double", transparent: true
+    //     });
+    //     world.add(grass);
+    // }
+
+
 
     initialized = true;
 }
@@ -61,37 +80,30 @@ function draw() {
     processServerData();
     player.move();
     player.hover();
-    console.log(player.position.y);
+    // console.log("player y pos:" + player.position.y);
 }
 
 function mousePressed() {
 	Tone.context.resume;
 }
 
-function processServerData()
-{
-
-
-    for (otherPlayerId in serverData.playerData)
-    {
+function processServerData() {
+    for (otherPlayerId in serverData.playerData) {
         if (otherPlayerId == myId) continue;
         var idExists = otherPlayerId in otherPlayers;
-        if (idExists == false)
-        {
+        if (idExists == false) {
             otherPlayers[otherPlayerId] = new OtherPlayer(otherPlayerId);
             //console.log("Found new player...need to add");
         }
 
-        else
-        {
+        else {
             otherPlayers[otherPlayerId].setPositionAndRotation(serverData.playerData[otherPlayerId].position, serverData.playerData[otherPlayerId].rotation);
         }
     }
 
     // console.log("flowerdata", serverData.flowerData);
 
-    for (flowerId in serverData.flowerData)
-    {
+    for (flowerId in serverData.flowerData) {
         // console.log(flowerId);
         player.flowerCollection.addIfNotPresent(serverData.flowerData[flowerId]);
     }
@@ -109,6 +121,7 @@ class Player {
         // keep track of player's rotation and position to send to the server
         this.position = new Vector3(random(-10, 10), 1, random(-10, 10));
         this.rotation = new Vector3(world.getUserRotation());
+        this.direction = 1;
 
         this.container = new Container3D({x: 0, y: 1.6, z: 5});
         world.add(this.container);
@@ -118,8 +131,7 @@ class Player {
         world.setUserPosition(this.position.x, this.position.y, this.position.z);
     }
 
-    initialize()
-    {
+    initialize() {
         this.flowerCollection.id = myId
     }
 
@@ -141,17 +153,17 @@ class Player {
 
     hover() {
     	if (this.position.y > 10.0)
-    		this.position.y -= 0.1;
+    		this.direction = -1;
     	if (this.position.y <= 1.0)
-    		this.position.y += 0.1;
+    		this.direction = 1;
 
-
+        this.position.y += 0.1 * this.direction;
     }
 
     keyPressed(key) {
         if (keyCode == 32){
             // plant the selected flower
-            this.flowerCollection.add(new Flower('rose', this.position.get(), world))
+            this.flowerCollection.add(new Flower("rose", this.position.get(), world))
             console.log(this.flowerCollection.flowers);
         }
     }

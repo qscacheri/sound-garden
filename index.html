@@ -14,10 +14,17 @@
         <script language="javascript" type="text/javascript" src="./aframe/aframe.min.js"></script>
         <script language="javascript" type="text/javascript" src="./aframe/aframep5.js"></script>
     </head>
+
     <body>
         <a-scene id = "VRScene">
             <a-assets id = "VRAssets">
                 <img id = "sky" src="assets/sky.png">
+
+                <img id="grass" src="assets/grass.png">
+
+                <a-asset id="gardenOBJ" src="/assets/garden/Garden.obj"></a-asset>
+                <a-asset id="gardenMTL" src="/assets/garden/Garden.mtl"></a-asset>
+
                 <a-asset id="sunflowerObj" src="/assets/sunflower/sunflower.obj"></a-asset>
                 <a-asset id="sunflowerMtl" src="/assets/sunflower/sunflower.mtl"></a-asset>
 
@@ -29,9 +36,9 @@
 
                 <a-asset id="desertLilyObj" src="/assets/desert_lily/desertLily.obj"></a-asset>
                 <a-asset id="desertLilyMtl" src="/assets/desert_lily/desertLily.mtl"></a-asset>
-
             </a-assets>
         </a-scene>
+
         <script src="./Flower.js"></script>
         <script src="client.js" charset="utf-8"></script>
     </body>
