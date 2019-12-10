@@ -69,6 +69,15 @@ class Flower {
 
         this.sample = flower.sample;
         world.add(this.obj);
+
+        this.panner = new Tone.Panner3D (this.position.x, this.position.y, this.position.z);
+        this.panner.toMaster();
+
+        this.player = new Tone.Player("./assets/audio_files/" + this.sample + ".wav");
+        this.player.autostart = true;
+        this.player.loop = true;
+        this.player.connect(this.panner);
+
     }
 
     toJSON(identifier) {

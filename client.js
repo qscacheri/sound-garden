@@ -31,7 +31,7 @@ socket.on('playerLost', function(lostPlayerId) {
 
 function setup() {
     world = new World('VRScene');
-
+    world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
     player = new Player();
 
     var ground = new Plane({
@@ -69,8 +69,6 @@ function mousePressed() {
 
 function processServerData()
 {
-
-
     for (otherPlayerId in serverData.playerData)
     {
         if (otherPlayerId == myId) continue;
@@ -123,10 +121,19 @@ class Player {
     }
 
     move() {
-        if (keyIsDown(87)) // w key
-            world.moveUserForward(.01);
-        if (keyIsDown(83))  // s key
+        console.log(this.position.x);
+
+        if (this.position.x > -9 && this.position.x < 9 && this.position.z > -9 && this.position.z < 9)
+        {
+            if (keyIsDown(87)) // w key
+                world.moveUserForward(.01);
+            if (keyIsDown(83))  // s key
+                world.moveUserForward(-.01);
+        }
+
+        else {
             world.moveUserForward(-.01);
+        }
 
         this.position.x = world.getUserPosition().x;
         this.position.z = world.getUserPosition().z;
@@ -207,5 +214,6 @@ class OtherPlayer {
 
     destroy(){
         world.remove(this.avatar);
+        world.remove(this.shadow);
     }
 }
