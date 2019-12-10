@@ -34,6 +34,14 @@ function setup() {
     world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
     player = new Player();
 
+    var garden = new OBJ({
+        asset: "gardenObj",
+        mtl: "gardenMtl"
+
+    })
+
+    world.add(garden);
+    
     var ground = new Plane({
         width: 20, height: 20,
         red: 59, green: 133, blue: 13,
