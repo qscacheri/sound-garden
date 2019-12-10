@@ -1,4 +1,3 @@
-
 const socket = io.connect(origin)
 var myId;
 var serverData = {};
@@ -8,7 +7,8 @@ var player;
 var processor;
 var world;
 var initialized = false;
-
+var rainSystem;
+var rainSound;
 
 socket.on('connect', function() {
     myId = socket.id;
@@ -28,15 +28,35 @@ socket.on('playerLost', function(lostPlayerId) {
 });
 
 ///////////////////////////////////////////////////////////////////////////
+function preload()
+{
+    rainSound = loadSound("assets/audio_files/rain_short.wav");
+}
 
 function setup() {
     world = new World('VRScene');
-
+    world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
     player = new Player();
 
+    rainSystem = new RainSystem();
+    var garden = new OBJ({
+        asset: "gardenObj",
+        mtl: "gardenMtl"
+
+    })
+
+    rainSound.play();
+    rainSound.loop();
+
+
+    world.add(garden);
+
     var ground = new Plane({
-        width: 20, height: 20,
-        red: 59, green: 133, blue: 13,
+        width: 20,
+        height: 20,
+        red: 59,
+        green: 133,
+        blue: 13,
         rotationX: -90
     });
     world.add(ground);
@@ -79,12 +99,14 @@ function setup() {
 function draw() {
     processServerData();
     player.move();
+    rainSystem.render();
     player.hover();
-    // console.log("player y pos:" + player.position.y);
 }
 
 function mousePressed() {
-	Tone.context.resume;
+    Tone.context.resume;
+    if (!rainSound.isLooping)
+        rainSound.loop();
 }
 
 function processServerData() {
@@ -123,7 +145,11 @@ class Player {
         this.rotation = new Vector3(world.getUserRotation());
         this.direction = 1;
 
-        this.container = new Container3D({x: 0, y: 1.6, z: 5});
+        this.container = new Container3D({
+            x: 0,
+            y: 1.6,
+            z: 5
+        });
         world.add(this.container);
 
         this.flowerCollection = new FlowerCollection(myId);
@@ -136,10 +162,16 @@ class Player {
     }
 
     move() {
-        if (keyIsDown(87)) // w key
-            world.moveUserForward(.01);
-        if (keyIsDown(83))  // s key
-            world.moveUserForward(-.01);
+        console.log(this.position.x, ",", this.position.z);
+
+        if (this.position.x > -9 && this.position.x < 9 && this.position.z > -9 && this.position.z < 9) {
+            if (keyIsDown(87)) // w key
+                world.moveUserForward(.01);
+            if (keyIsDown(83)) // s key
+                world.moveUserForward(-.01);
+        } else {
+            // world.moveUserForward(-.01);
+        }
 
         this.position.x = world.getUserPosition().x;
         this.position.z = world.getUserPosition().z;
@@ -148,6 +180,8 @@ class Player {
         this.sendDataToServer();
 
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
+        Tone.Listener.setOrientation(this.rotation.x, this.rotation.y, this.rotation.z, 0, 0, 1);
+
         //console.log(Tone.Listener.positionX, ",", Tone.Listener.positionZ);
     }
 
@@ -161,7 +195,7 @@ class Player {
     }
 
     keyPressed(key) {
-        if (keyCode == 32){
+        if (keyCode == 32) {
             // plant the selected flower
             this.flowerCollection.add(new Flower("rose", this.position.get(), world))
             console.log(this.flowerCollection.flowers);
@@ -170,7 +204,7 @@ class Player {
 
     sendDataToServer() {
         socket.emit("clientData", {
-            playerData : {
+            playerData: {
                 position: this.position.get(),
                 rotation: this.rotation.get()
             },
@@ -189,15 +223,25 @@ class OtherPlayer {
         this.position = new Vector3(0, 1, 0);
         this.rotation = new Vector3(0, 0, 0);
         this.avatar = new Sphere({
-            x: this.position.x, y: this.position.y, z: this.position.z,
-            red: random(255), green: random(255), blue: random(255),
+            x: this.position.x,
+            y: this.position.y,
+            z: this.position.z,
+            red: random(255),
+            green: random(255),
+            blue: random(255),
             radius: 0.1
         });
 
         this.shadow = new Cylinder({
-            x: this.position.x, y: .001, z: this.position.z,
-            red: 0, green: 0, blue: 0,
-            scaleX: .1, scaleY: .01, scaleZ: .1
+            x: this.position.x,
+            y: .001,
+            z: this.position.z,
+            red: 0,
+            green: 0,
+            blue: 0,
+            scaleX: .1,
+            scaleY: .01,
+            scaleZ: .1
         });
 
     }
@@ -218,7 +262,54 @@ class OtherPlayer {
         this.shadow.setPosition(this.position.x, .00001, this.position.z);
     }
 
-    destroy(){
+    destroy() {
         world.remove(this.avatar);
+        world.remove(this.shadow);
+    }
+}
+
+class RainDrop {
+    constructor() {
+        this.sphere = new Sphere({
+            radius: .01,
+            red: 255,
+            green: 255,
+            blue: 255,
+            x: random(-10, 10),
+            y: random(20, 30),
+            z: random(-10, -10)
+        })
+        // this.speedX = random(-.5, .5);
+        this.speedY = random(-.5, -.8);
+        world.add(this.sphere);
+    }
+    move() {
+        this.sphere.nudge(0, this.speedY, 0);
+        if (this.sphere.getY() <= 0)
+            return true;
+        else return false;
+    }
+    reset() {
+        this.sphere.setPosition(random(-10, 10), random(20, 30), random(-10, 10));
+        this.speedY = random(-.1, -.5);
+    }
+}
+
+class RainSystem {
+    constructor() {
+        this.rainDrops = [];
+        for (var i = 0; i < 1000; i++) {
+            this.rainDrops.push(new RainDrop());
+        }
+    }
+
+    render() {
+        for (var i = 0; i < this.rainDrops.length; i++) {
+            var shouldDelete = this.rainDrops[i].move();
+            if (shouldDelete) {
+                this.rainDrops[i].reset();
+            }
+        }
+
     }
 }
