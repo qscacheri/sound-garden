@@ -23,7 +23,7 @@ app.get('/', function(request, response) {
 });
 
 // Star listening on port 80 for web stuff
-server.listen(8888, function() {
+server.listen(3000, function() {
     console.log('starting webserver');
 });
 
