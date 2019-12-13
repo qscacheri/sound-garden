@@ -45,6 +45,8 @@ function preload() {
 }
 
 function setup() {
+    $("#loadingMsg").hide();
+
     world = new World('VRScene');
     world.camera.holder.setAttribute('wasd-controls', "enabled: false;");
     player = new Player();
@@ -84,19 +86,19 @@ function setup() {
     world.add(signContainer);
 
     textHolder = new Plane({
-        x: 0,
-        y: 1.6,
-        z: .05,
-        width: .0001,
-        height: .0001,
-        // red: 142, green: 102, blue: 80
-        red: 0,
-        green: 0,
-        blue: 0
-
+        x: 0, y: 1.6, z: .05,
+        width: .0001, height: .0001,
+        red: 0, green: 0, blue: 0
     });
     signContainer.addChild(textHolder);
-    // world.add(textHolder);
+
+    textHolder2 = new Plane({
+        x: 0, y: 1.4, z: .05,
+        width: .0001, height: .0001,
+        red: 0, green: 0, blue: 0
+    });
+    signContainer.addChild(textHolder2);
+
     var sign = new OBJ({
         x: 0,
         y: 1.5,
@@ -107,8 +109,11 @@ function setup() {
     });
     signContainer.addChild(sign);
     // world.add(sign);
-    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(255,255,255); align: center; width: 3.4em;');
-    console.log(textHolder.tag);
+    console.log(textHolder);
+    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(255,255,255); align: center; width: 3.4em; font: "fantasy";');
+    textHolder2.tag.setAttribute('text', 'value: press "spacebar"\nto plant flowers; color: rgb(255,255,255); align: center; width: 2.0em; font:"fantasy";');
+
+    // console.log(textHolder.tag);
 
     // used for boundary testing
     // var xNeg = new Box({
@@ -206,9 +211,9 @@ class Player {
         // console.log(this.position.x, ",", this.position.z);
 
         if (keyIsDown(87)) // w key
-            world.moveUserForward(.1);
+            world.moveUserForward(.05);
         if (keyIsDown(83)) // s key
-            world.moveUserForward(-.1);
+            world.moveUserForward(-.05);
 
         this.position.x = world.getUserPosition().x;
         this.position.z = world.getUserPosition().z;
@@ -235,7 +240,6 @@ class Player {
             this.position.z = 7;
             world.setUserPosition(this.position.x, this.position.y, this.position.z)
         }
-        console.log(world.getUserPosition());
 
         Tone.Listener.setPosition(this.position.x, this.position.y, this.position.z);
         Tone.Listener.setOrientation(this.rotation.x, this.rotation.y, this.rotation.z, 0, 0, 1);
