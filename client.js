@@ -110,8 +110,8 @@ function setup() {
     signContainer.addChild(sign);
     // world.add(sign);
     console.log(textHolder);
-    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(255,255,255); align: center; width: 3.4em; font: "fantasy";');
-    textHolder2.tag.setAttribute('text', 'value: press "spacebar"\nto plant flowers; color: rgb(255,255,255); align: center; width: 2.0em; font:"fantasy";');
+    textHolder.tag.setAttribute('text', 'value: Sound Garden; color: rgb(255,255,255); align: center; width: 3.4em;');
+    textHolder2.tag.setAttribute('text', 'value: press "spacebar"\nto plant flowers; color: rgb(255,255,255); align: center; width: 2.0em;');
 
     // console.log(textHolder.tag);
 
